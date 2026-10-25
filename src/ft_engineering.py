@@ -8,7 +8,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.model_selection import train_test_split
 
-from Cargar_datos import cargarDatos
+from cargar_datos import cargarDatos
 
 import warnings
 warnings.filterwarnings('ignore')

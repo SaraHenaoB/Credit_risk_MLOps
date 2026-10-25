@@ -14,7 +14,7 @@ from lightgbm import LGBMClassifier
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, accuracy_score, f1_score
 
 from ft_engineering import ft_engineering_pipeline
-from Cargar_datos import cargarDatos
+from cargar_datos import cargarDatos
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -111,8 +111,12 @@ def plot_comparisons(df_metrics):
     plt.ylabel("Segundos")
     
     plt.tight_layout()
-    plt.savefig("metricas_comparativas_modelos.png")
-    plt.show()
+    plt.savefig(
+        "metricas_comparativas_modelos.png",
+        bbox_inches="tight",
+        dpi=150
+    )
+    plt.close()
     print("\n[INFO] Gráfico comparativo guardado como 'metricas_comparativas_modelos.png'")
 
 def main():
@@ -159,11 +163,25 @@ def main():
 
     # Creamos el directorio models si no existe en la raíz
     os.makedirs("models", exist_ok=True)
-    
-    # Guardamos de forma física el modelo entrenado y el preprocesador
-    joblib.dump(best_model_object, "models/xgb_model.joblib")
-    joblib.dump(preprocessor, "models/preprocessor.joblib")
-    print("[MLOps INFO] Modelo campeón y Preprocesador exportados con éxito a la carpeta 'models/'")
+
+     # Usar nombres genéricos y estables para los artefactos
+    model_path = os.path.join("models", "best_model.joblib")
+    preprocessor_path = os.path.join("models", "preprocessor.joblib")
+
+    # Guardar el modelo ganador y el preprocesador
+    joblib.dump(best_model_object, model_path)
+    joblib.dump(preprocessor, preprocessor_path)
+
+    # Mostrar las rutas estandarizadas
+    print(
+        f"[MLOps INFO] Modelo ganador exportado: "
+        f"{model_path.replace(os.sep, '/')}"
+    )
+    print(
+        f"[MLOps INFO] Preprocesador exportado: "
+        f"{preprocessor_path.replace(os.sep, '/')}"
+    )
+
     # ==================================================================
 
     #mejor modelo y el preprocesador entrenado

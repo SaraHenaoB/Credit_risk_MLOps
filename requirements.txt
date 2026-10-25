@@ -7,7 +7,7 @@ numpy>=1.24.0
 scipy>=1.10.0          # Distribution drift tests
 
 # --- Machine learning and modeling ---
-scikit-learn>=1.2.0
+scikit-learn==1.9.0
 xgboost>=1.7.0         # Selected production model
 lightgbm>=4.0.0        # Additional model support
 joblib>=1.2.0          # Model serialization
