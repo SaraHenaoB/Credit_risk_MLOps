@@ -1,38 +1,38 @@
 # Credit_risk_MLOps
-Sistema de monitoreo de datos e inferencia de riesgo crediticio mediante Machine Learning.
+Data monitoring and credit risk inference system using Machine Learning.
 
-[![Live Demo](https://img.shields.io/badge/🚀_Demo_en_vivo-Streamlit-FF4B4B?style=for-the-badge)](https://creditriskmlops-wxj6b2kakwswk6hebewmkc.streamlit.app/)
-
-
-Proyecto de Machine Learning y MLOps orientado a la predicción del comportamiento de pago de créditos, con un pipeline de entrenamiento, monitoreo de data drift y despliegue de un modelo de inferencia mediante FastAPI y Docker.
-
-Nota: El dashboard de monitoreo y la API de inferencia son componentes separados. La disponibilidad pública de la aplicación de Streamlit no implica que la API FastAPI esté publicada en internet.
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Streamlit-FF4B4B?style=for-the-badge)](https://creditriskmlops-wxj6b2kakwswk6hebewmkc.streamlit.app/)
 
 
-## Contexto del negocio
+A Machine Learning and MLOps project focused on predicting credit repayment behavior, featuring a training pipeline, data drift monitoring, and deployment of an inference model using FastAPI and Docker.
 
-La correcta gestión del riesgo crediticio exige herramientas capaces de predecir la probabilidad de mora de nuevos usuarios. El núcleo de este proyecto consiste en desarrollar un modelo predictivo mediante técnicas de aprendizaje automático, utilizando información histórica de créditos para anticipar con precisión el comportamiento financiero de los clientes. 
-
-Aunque los algoritmos de Machine Learning resuelven la predicción inicial, el verdadero reto en producción radica en controlar la degradación del modelo debido a cambios en el entorno (*data drift*). Para afrontarlo, este proyecto implementa un ecosistema integral de **MLOps** estructurado en módulos independientes que centraliza la transformación de datos, el entrenamiento automatizado, el monitoreo estadístico y el despliegue del modelo en un contenedor Docker orquestado con FastAPI.
-
-Debido a que la empresa opera bajo un esquema estructurado de proyectos, esta iniciativa se ciñe estrictamente a una arquitectura de carpetas predefinida e inalterable. Esta rigidez es fundamental, ya que los procesos de despliegue a producción están completamente automatizados a través de pipelines de validación en **Jenkins**; cualquier alteración en la organización de los archivos generaría fallos en el flujo de integración y retrasos significativos en el paso a producción. De este modo, la infraestructura no solo valida el rendimiento técnico actual, sino que asegura un ciclo de vida reproducible, auditable y alineado con los estándares operativos de la organización.
+Note: The monitoring dashboard and the inference API are separate components. The public availability of the Streamlit application does not mean that the FastAPI API is published on the internet.
 
 
----
+## Business Context
 
-## Objetivo del Negocio
+Proper credit risk management requires tools capable of predicting the probability that new users will default. The core of this project is to develop a predictive model using machine learning techniques and historical credit data to accurately anticipate customers' financial behavior. 
 
-Predecir la probabilidad de que un cliente pague un crédito financiero a tiempo o entre en mora:
-*   **Variable Objetivo ('Pago_atiempo')**: 
-    *   1: El cliente paga a tiempo.
-    *   0: El cliente entra en mora (Clase Crítica).
-*   **Desbalanceo Crítico**: 95% pertenecen a la clase 1 y solo 5% a la clase 0. El pipeline tiene en cuenta este desbalanceo para el entrenamiento de modelos.
+Although Machine Learning algorithms handle the initial prediction, the real challenge in production is controlling model degradation caused by changes in the environment (*data drift*). To address this, this project implements a comprehensive **MLOps** ecosystem structured into independent modules that centralizes data transformation, automated training, statistical monitoring, and model deployment in a Docker container orchestrated with FastAPI.
+
+Because the company operates under a structured project framework, this initiative strictly adheres to a predefined, unalterable folder architecture. This rigidity is essential because production deployment processes are fully automated through **Jenkins** validation pipelines; any change to the file organization would cause integration workflow failures and significant delays in moving to production. In this way, the infrastructure not only validates current technical performance but also ensures a reproducible, auditable lifecycle aligned with the organization's operational standards.
+
 
 ---
 
-## Arquitectura del Software y Componentes
+## Business Objective
 
-El proyecto está modularizado en scripts de Python independientes para asegurar mantenibilidad y escalabilidad en entornos productivos:
+Predict the probability that a customer will repay a financial loan on time or default:
+*   **Target Variable ('Pago_atiempo')**: 
+    *   1: The customer pays on time.
+    *   0: The customer defaults (Critical Class).
+*   **Critical Class Imbalance**: 95% belong to class 1 and only 5% to class 0. The pipeline accounts for this imbalance when training models.
+
+---
+
+## Software Architecture and Components
+
+The project is modularized into independent Python scripts to ensure maintainability and scalability in production environments:
 ```
 Credit_risk_MLOps/
 ├── src/
@@ -52,105 +52,104 @@ Credit_risk_MLOps/
 └── README.md
 ```
 
-## Componentes principales
+## Main Components
 ```
-Archivo                         |    Responsabilidad
+File                            |    Responsibility
 -------------------------------------------------------------------------------------------------------------------------
-cargar_datos.py                 |    Carga el conjunto de datos utilizado por el pipeline.
-ft_engineering.py               |    Prepara los datos, controla la fuga de información y construye el preprocesamiento.
-model_training_evaluation.py    |    Entrena y compara modelos, selecciona el mejor candidato y guarda los artefactos.
-model_monitoring.py             |    Implementa el dashboard Streamlit para el monitoreo de data drift.
-model_deploy.py                 |    Expone el modelo entrenado mediante una API FastAPI para realizar predicciones.
-src/models/                     |    Contiene el modelo seleccionado y el preprocesador serializados.
-Dockerfile                      |    Define la imagen que contiene el entorno y el código para ejecutar la API.
-requirements.txt                |    Declara las dependencias de Python.
+cargar_datos.py                 |    Loads the dataset used by the pipeline.
+ft_engineering.py               |    Prepares the data, controls data leakage, and builds the preprocessing pipeline.
+model_training_evaluation.py    |    Trains and compares models, selects the best candidate, and saves the artifacts.
+model_monitoring.py             |    Implements the Streamlit dashboard for data drift monitoring.
+model_deploy.py                 |    Exposes the trained model through a FastAPI API to make predictions.
+src/models/                     |    Contains the serialized selected model and preprocessor.
+Dockerfile                      |    Defines the image containing the environment and code required to run the API.
+requirements.txt                |    Declares the Python dependencies.
 ```
 
-## Ingeniería de características y preprocesamiento
-El módulo ft_engineering.py prepara los datos para el entrenamiento y la inferencia, procurando mantener un tratamiento consistente entre ambos procesos.
-### Prevención de fuga de datos
-Se excluyen variables que podrían incorporar información posterior al otorgamiento del crédito o introducir fuga de información, entre ellas:
+## Feature Engineering and Preprocessing
+The ft_engineering.py module prepares data for training and inference, aiming to maintain consistent processing across both processes.
+### Data Leakage Prevention
+Variables that could contain information from after the credit was granted or introduce data leakage are excluded, including:
 - saldo_mora
 - saldo_mora_codeudor
 - saldo_total
 - saldo_principal
 - puntaje
 
-La variable objetivo Pago_atiempo tampoco debe formar parte de las variables de entrada del modelo.
-### Validación temporal
-Los registros se ordenan cronológicamente mediante fecha_prestamo y se separan en conjuntos de entrenamiento y prueba, con una proporción de 80 % y 20 %, respectivamente, utilizando shuffle=False.
+The target variable Pago_atiempo must not be included among the model's input features either.
+### Temporal Validation
+Records are sorted chronologically by fecha_prestamo and split into training and test sets at a ratio of 80% and 20%, respectively, using shuffle=False.
 
-Este enfoque permite evaluar el modelo con registros posteriores a los utilizados para entrenarlo y reduce el riesgo de fuga temporal.
-### Pipeline de preprocesamiento
-El preprocesamiento se integra mediante ColumnTransformer:
-- Variables numéricas: imputación por mediana, indicadores de valores faltantes cuando corresponde y escalamiento mediante StandardScaler.
-- Variables nominales: imputación por la categoría más frecuente y codificación con OneHotEncoder.
-- Variables ordinales: tratamiento explícito de valores faltantes, codificación mediante OrdinalEncoder y escalamiento cuando corresponde.
-El preprocesador ajustado durante el entrenamiento se guarda como preprocessor.joblib para reutilizar las mismas transformaciones durante la inferencia.
+This approach makes it possible to evaluate the model on records later than those used for training and reduces the risk of temporal leakage.
+### Preprocessing Pipeline
+Preprocessing is integrated using ColumnTransformer:
+- Numeric variables: median imputation, missing-value indicators where applicable, and scaling using StandardScaler.
+- Nominal variables: imputation using the most frequent category and encoding with OneHotEncoder.
+- Ordinal variables: explicit handling of missing values, encoding using OrdinalEncoder, and scaling where applicable.
+The preprocessor fitted during training is saved as preprocessor.joblib so the same transformations can be reused during inference.
 
-## Entrenamiento y evaluación de modelos
-El módulo model_training_evaluation.py entrena y compara distintos algoritmos de clasificación para seleccionar el modelo candidato con mejor rendimiento según la métrica definida en el pipeline.
-### Modelos evaluados
-- Regresión logística (Logistic Regression).
-- Bosque aleatorio (Random Forest).
+## Model Training and Evaluation
+The model_training_evaluation.py module trains and compares different classification algorithms to select the best-performing candidate model according to the metric defined in the pipeline.
+Models evaluated
+- Logistic Regression.
+- Random Forest.
 - XGBoost.
 - LightGBM.
+Evaluation
+Due to class imbalance, metrics such as F1-Macro and ROC-AUC are considered, along with a comparison of training and test performance.
 
-### Evaluación
-Debido al desbalanceo de clases, se consideran métricas como F1-Macro y ROC-AUC, además de la comparación del rendimiento entre entrenamiento y prueba.
+The pipeline automatically selects the model based on the results obtained, rather than relying on a manually fixed algorithm.
 
-El pipeline selecciona el modelo automáticamente a partir de los resultados obtenidos, en lugar de depender de un algoritmo fijado manualmente.
+The artifacts used for deployment are:
+- best_model.joblib: selected model.
+- preprocessor.joblib: transformations fitted during training.
+- metricas_comparativas_modelos.png: comparative visualization of the calculated metrics.
+The model selection and its metrics should correspond to the latest documented pipeline run.
 
-Los artefactos utilizados en el despliegue son:
-- best_model.joblib: modelo seleccionado.
-- preprocessor.joblib: transformaciones ajustadas durante el entrenamiento.
-- metricas_comparativas_modelos.png: visualización comparativa de las métricas calculadas.
-La selección del modelo y sus métricas deben corresponder a la última ejecución documentada del pipeline.
+## Data Monitoring (Data Drift)
+The model_monitoring.py module contains a dashboard developed with Streamlit to compare reference data with recent data and detect potential changes in their distributions.
+### Methodology
+The process sorts records by date and establishes a historical reference population (80%) and a recent population (20%). For monitoring tests, changes in certain financial variables are simulated.
 
-## Monitoreo de datos (Data Drift)
-El módulo model_monitoring.py contiene un dashboard desarrollado con Streamlit para comparar los datos de referencia con los datos recientes y detectar posibles cambios en sus distribuciones.
-### Metodología
-El proceso ordena los registros por fecha y establece una población de referencia histórica (80 %) y una población reciente (20 %). Para las pruebas de monitoreo se utiliza una simulación de cambios en determinadas variables financieras.
+The simulated modifications include a 30% reduction in salario_cliente and a 40% increase in capital_prestado. These changes make it possible to assess whether the system identifies known deviations; they do not necessarily represent changes observed in production.
+### Statistical Tests
 
-Entre las modificaciones simuladas se encuentran una reducción del 30 % en salario_cliente y un incremento del 40 % en capital_prestado. Estos cambios permiten evaluar si el sistema identifica desviaciones conocidas; no representan necesariamente cambios observados en producción.
-### Pruebas estadísticas
+- Kolmogorov-Smirnov (KS): compares distributions of numeric variables.
+- Chi-square: evaluates differences in the distributions of categorical variables.
+- Population Stability Index (PSI) and Jensen-Shannon divergence (JS): complement the analysis of distributional changes when calculated by the module.
 
-- Kolmogorov-Smirnov (KS): compara distribuciones de variables numéricas.
-- Chi-cuadrado: evalúa diferencias en las distribuciones de variables categóricas.
-- Population Stability Index (PSI) y Jensen-Shannon divergence (JS): complementan el análisis de cambios distributivos cuando están calculados por el módulo.
+A p-value below 0.05 is used as the detection criterion for the corresponding statistical tests. PSI and JS indicators should be interpreted according to the thresholds implemented in the code.
 
-Un p-valor inferior a 0,05 se utiliza como criterio de detección para las pruebas estadísticas correspondientes. Los indicadores PSI y JS deben interpretarse de acuerdo con los umbrales implementados en el código.
+### Visualization and Alerts
+The dashboard allows users to review monitoring results through tables and charts. Variables identified as having deviations are highlighted visually to make them easier to review.
 
-### Visualización y alertas
-El dashboard permite consultar los resultados del monitoreo mediante tablas y gráficos. Las variables identificadas con desviaciones se resaltan visualmente para facilitar su revisión.
+The aggregated alert logic issues a review or potential retraining signal when more than two variables show drift according to the configured rules.
 
-La lógica de alerta agregada contempla una señal de revisión o posible reentrenamiento cuando más de dos variables presentan drift según las reglas configuradas.
+Published application: Available at the link at the beginning of the README
 
-Aplicación publicada: Se encuentra disponible en el link al inicio del README
+Data drift monitoring alone does not demonstrate that predictive performance has decreased. Evaluating such degradation would also require subsequent ground-truth labels and updated performance metrics.
 
-El monitoreo de data drift no demuestra por sí solo que el rendimiento predictivo haya disminuido. Para evaluar esa degradación también se necesitarían etiquetas reales posteriores y métricas de desempeño actualizadas.
-
-## API de inferencia con FastAPI
-El archivo model_deploy.py implementa el servicio de inferencia. Carga el modelo y el preprocesador serializados, valida los datos de entrada, aplica las transformaciones y devuelve las predicciones en formato JSON.
+## Inference API with FastAPI
+The model_deploy.py file implements the inference service. It loads the serialized model and preprocessor, validates the input data, applies the transformations, and returns predictions in JSON format.
 ### Endpoints
-Método	Endpoint	Descripción
+Method	Endpoint	Description
 
 ```
-GET	/   	        Confirma que la API está activa.
-GET	/docs	        Abre la documentación interactiva de Swagger.
-POST	/predict	Recibe registros en JSON y devuelve las predicciones.
+GET	/   	        Confirms that the API is active.
+GET	/docs	        Opens the interactive Swagger documentation.
+POST	/predict	Receives records in JSON and returns predictions.
 ```
 
-El endpoint /predict admite predicciones por lotes, de modo que varios registros pueden enviarse en una única solicitud.
+The /predict endpoint supports batch predictions, allowing multiple records to be sent in a single request.
 
-La respuesta incluye la clase predicha, su interpretación y las probabilidades por clase disponibles.
+The response includes the predicted class, its interpretation, and the available class probabilities.
 
-La interpretación de las clases es:
-- 1: paga a tiempo.
-- 0: incumplimiento.
+The classes are interpreted as follows:
+- 1: pays on time.
+- 0: default.
 
-Ejemplo de solicitud
-El siguiente ejemplo ilustra la estructura de entrada para un registro:
+Example request
+The following example illustrates the input structure for one record:
 
 ```
 {
@@ -177,111 +176,111 @@ El siguiente ejemplo ilustra la estructura de entrada para un registro:
 }
 ```
 
-Los valores son ilustrativos. Los nombres, tipos de datos y categorías enviados deben coincidir con los esperados por la API.
+The values are illustrative. The names, data types, and categories submitted must match those expected by the API.
 
-## Instalación y ejecución local
-Requisitos previos
+## Local Installation and Execution
+Prerequisites
 - Git.
-- Python compatible con las dependencias declaradas.
-- Docker Desktop, si se desea ejecutar el servicio en un contenedor.
+- Python compatible with the declared dependencies.
+- Docker Desktop, if you want to run the service in a container.
 
-### 1. Clonar el repositorio
+### 1. Clone the repository
 ```
 git clone https://github.com/SaraHenaoB/Credit_risk_MLOps.git
 cd Credit_risk_MLOps
 ```
-### 2. Crear un entorno virtual
+### 2. Create a virtual environment
 
-En Windows PowerShell:
+On Windows PowerShell:
 ```
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
-En macOS o Linux:
+On macOS or Linux:
 ```
 python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### 3. Instalar dependencias
+### 3. Install dependencies
 ```
 python -m pip install -r requirements.txt
 ```
-### 4. Ejecutar el dashboard de monitoreo
-Desde la raíz del repositorio:
+### 4. Run the monitoring dashboard
+From the repository root:
 ```
 streamlit run src/model_monitoring.py
 ```
-Streamlit mostrará en la terminal la dirección local para abrir el dashboard en el navegador.
+Streamlit will display the local address in the terminal for opening the dashboard in a browser.
 
-### 5. Ejecutar la API de inferencia
-En otra terminal, desde la raíz del repositorio y con las dependencias instaladas:
+### 5. Run the inference API
+In another terminal, from the repository root and with the dependencies installed:
 ```
 uvicorn src.model_deploy:app --host 127.0.0.1 --port 8000
 ```
 
-Abrir la documentación interactiva en:
+Open the interactive documentation at:
 
 http://localhost:8000/docs
 
-Desde Swagger se puede ejecutar POST /predict y comprobar la respuesta de la API con el registro de ejemplo.
+From Swagger, you can run POST /predict and check the API response using the example record.
 
-## Construcción y ejecución con Docker
+## Building and Running with Docker
 
-El proyecto incluye un Dockerfile que instala las dependencias y copia el código y los artefactos necesarios para ejecutar la API.
-### 1. Construir la imagen
-Desde la raíz del repositorio:
+The project includes a Dockerfile that installs the dependencies and copies the code and artifacts required to run the API.
+### 1. Build the image
+From the repository root:
 ```
 docker build -t credit-risk-mlops .
 ```
 
-### 2. Ejecutar el contenedor
+### 2. Run the container
 ```
 docker run --name credit-risk-api -p 8000:8000 credit-risk-mlops
 ```
 
-La API estará disponible localmente en:
+The API will be available locally at:
 - API: http://localhost:8000/
-- Documentación interactiva: http://localhost:8000/docs
+- Interactive documentation: http://localhost:8000/docs
 
-### 3. Probar las predicciones
+### 3. Test predictions
 
-En Swagger:
-1. Abrir /docs.
-2. Seleccionar POST /predict.
-3. Pulsar Try it out.
-4. Introducir un JSON que cumpla el esquema de entrada.
-5. Pulsar Execute y revisar el código HTTP y el resultado.
+In Swagger:
+1. Open /docs.
+2. Select POST /predict.
+3. Click Try it out.
+4. Enter JSON that conforms to the input schema.
+5. Click Execute and review the HTTP status code and result.
 
-Para detener el contenedor, utiliza Ctrl+C en la terminal donde se está ejecutando. Si se ejecuta en segundo plano, puede detenerse mediante:
+To stop the container, use Ctrl+C in the terminal where it is running. If it is running in the background, it can be stopped using:
 ```
 docker stop credit-risk-api
 ```
-Si se necesita crear nuevamente un contenedor con el mismo nombre después de eliminarlo:
+If you need to create a container with the same name again after removing it:
 ```
 docker rm credit-risk-api
 ```
-La imagen Docker contiene el servicio de inferencia. La aplicación Streamlit publicada es un componente separado; publicar el dashboard no implica que la API FastAPI también esté disponible públicamente.
+The Docker image contains the inference service. The published Streamlit application is a separate component; publishing the dashboard does not mean that the FastAPI API is also publicly available.
 
-## Tecnologías utilizadas
-- Lenguaje: Python.
-- Manipulación de datos: Pandas y NumPy.
-- Machine Learning: scikit-learn, XGBoost y LightGBM.
-- Monitoreo y visualización: Streamlit, SciPy y bibliotecas de visualización.
-- API: FastAPI y Uvicorn.
-- Serialización de modelos: Joblib.
-- Contenerización: Docker.
-- Control de versiones: Git y GitHub.
+## Technologies Used
+- Language: Python.
+- Data manipulation: Pandas and NumPy.
+- Machine Learning: scikit-learn, XGBoost, and LightGBM.
+- Monitoring and visualization: Streamlit, SciPy, and visualization libraries.
+- API: FastAPI and Uvicorn.
+- Model serialization: Joblib.
+- Containerization: Docker.
+- Version control: Git and GitHub.
 
-## Limitaciones y próximos pasos
-- Validar el modelo con datos adicionales y posteriores al período de entrenamiento.
-- Evaluar periódicamente las métricas predictivas por clase cuando estén disponibles las etiquetas reales.
-- Definir procedimientos controlados para revisar alertas y decidir cuándo corresponde reentrenar.
-- Incorporar registros, métricas operativas y seguimiento de las versiones del modelo.
-- Configurar y asegurar un despliegue público de la API si se requiere consumir predicciones desde sistemas externos.
-La detección de data drift es una señal de cambio en los datos y no equivale automáticamente a una caída del rendimiento del modelo. Del mismo modo, las predicciones no deben considerarse una decisión financiera definitiva sin validaciones adicionales y controles apropiados.
+## Limitations and Next Steps
+- Validate the model with additional data collected after the training period.
+- Periodically evaluate predictive metrics by class when ground-truth labels become available.
+- Define controlled procedures for reviewing alerts and deciding when retraining is appropriate.
+- Incorporate logs, operational metrics, and model version tracking.
+- Configure and secure a public API deployment if predictions need to be consumed by external systems.
+Data drift detection is a signal that the data has changed and does not automatically mean that model performance has declined. Likewise, predictions should not be considered a definitive financial decision without additional validation and appropriate controls.
 
-## 👩‍💻 Autora
+## 👩‍💻 Author
 
 Sara Henao
 
