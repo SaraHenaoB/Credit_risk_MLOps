@@ -75,6 +75,7 @@ Se excluyen variables que podrían incorporar información posterior al otorgami
 - saldo_total
 - saldo_principal
 - puntaje
+
 La variable objetivo Pago_atiempo tampoco debe formar parte de las variables de entrada del modelo.
 ### Validación temporal
 Los registros se ordenan cronológicamente mediante fecha_prestamo y se separan en conjuntos de entrenamiento y prueba, con una proporción de 80 % y 20 %, respectivamente, utilizando shuffle=False.
@@ -89,12 +90,13 @@ El preprocesador ajustado durante el entrenamiento se guarda como preprocessor.j
 
 ## Entrenamiento y evaluación de modelos
 El módulo model_training_evaluation.py entrena y compara distintos algoritmos de clasificación para seleccionar el modelo candidato con mejor rendimiento según la métrica definida en el pipeline.
-Modelos evaluados
+### Modelos evaluados
 - Regresión logística (Logistic Regression).
 - Bosque aleatorio (Random Forest).
 - XGBoost.
 - LightGBM.
-Evaluación
+
+### Evaluación
 Debido al desbalanceo de clases, se consideran métricas como F1-Macro y ROC-AUC, además de la comparación del rendimiento entre entrenamiento y prueba.
 
 El pipeline selecciona el modelo automáticamente a partir de los resultados obtenidos, en lugar de depender de un algoritmo fijado manualmente.
@@ -146,6 +148,7 @@ La respuesta incluye la clase predicha, su interpretación y las probabilidades 
 La interpretación de las clases es:
 - 1: paga a tiempo.
 - 0: incumplimiento.
+
 Ejemplo de solicitud
 El siguiente ejemplo ilustra la estructura de entrada para un registro:
 
